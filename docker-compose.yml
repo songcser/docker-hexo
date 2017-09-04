@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  blog:
+    build: 
+      context: 3.2/alpine/
+    volumes:
+      - "${HOME}/.ssh:/root/.ssh"
+      - "${PWD}/blog/source:/Hexo/source"
+      - "${PWD}/blog/themes:/Hexo/themes"
+      - "${PWD}/blog/_config.yml:/Hexo/_config.yml"
+    ports:
+      - "8100:80"
+    networks:
+      - hexo-network
+    command: ['songcser', 'songjiyi2008@163.com', 's']
+
+networks:
+  hexo-network:
+    driver: bridge
