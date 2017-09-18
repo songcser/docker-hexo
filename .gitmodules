@@ -1,0 +1,3 @@
+[submodule "blog/.deploy_git"]
+	path = blog/.deploy_git
+	url = git@github.com:songcser/songcser.github.io.git
