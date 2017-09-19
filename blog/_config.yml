@@ -63,11 +63,38 @@ pagination_dir: page
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-theme: landscape
+#theme: landscape
+theme: replica
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
   type: git
-  repo: git@github.com:songcser/songcser.github.io.git
-  branch: master
+  repo: 
+    github: git@github.com:songcser/songcser.github.io.git,master
+    coding: git@git.coding.net:jysong/jysong.git,master
+
+
+gcs: # GOOGLE CUSTOM SEARCH
+baidutongji: # BAIDU TONGJI CODE
+disqus: # DISQUS ID
+
+location: Shang Hai
+email: songjiyi2008@163.com
+
+#marked setting for markdown
+marked:
+  gfm: true
+  pedantic: false
+  sanitize: false
+  tables: true
+  breaks: true
+  smartLists: true
+  smartypants: true
+
+avatar: https://avatars2.githubusercontent.com/u/5300359?v=4&s=460
+social:
+  github: https://github.com/songcser
+  weibo: http://weibo.com/206663121
+  linkedin: 
+

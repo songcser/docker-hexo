@@ -1,3 +1,6 @@
 [submodule "blog/.deploy_git"]
 	path = blog/.deploy_git
 	url = git@github.com:songcser/songcser.github.io.git
+[submodule "blog/themes/replica"]
+	path = blog/themes/replica
+	url = git@github.com:sabrinaluo/hexo-theme-replica.git
