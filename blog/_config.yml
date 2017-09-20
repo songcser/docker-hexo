@@ -3,10 +3,10 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Hexo
+title: Herry's blog
 subtitle:
 description:
-author: John Doe
+author: songcser
 language:
 timezone:
 
@@ -72,7 +72,7 @@ deploy:
   type: git
   repo: 
     github: git@github.com:songcser/songcser.github.io.git,master
-    coding: git@git.coding.net:jysong/jysong.git,master
+    coding: git@git.coding.net:songcser/songcser.git,master
 
 
 gcs: # GOOGLE CUSTOM SEARCH
@@ -95,6 +95,6 @@ marked:
 avatar: https://avatars2.githubusercontent.com/u/5300359?v=4&s=460
 social:
   github: https://github.com/songcser
-  weibo: http://weibo.com/206663121
+  weibo: http://weibo.com/1751043871
   linkedin: 
 
