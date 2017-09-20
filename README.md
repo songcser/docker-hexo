@@ -52,3 +52,28 @@ iyannik0215/docker-hexo {你的 github username} {你的 github email} d
 如果需要创建文章就手动创建到 source/_posts 目录下, 使用 docker start hexo-server, 就可以在 浏览器中实时预览了.
 
 如果需要部署 blog, 就可以直接使用 docker start hexo-deploy, 容器会后台部署, 完毕后自动退出的.
+
+
+### new
+
+```
+docker-compose exec blog hexo new [layout] <title>
+```
+
+### generate
+
+```
+docker-compose exec blog hexo generate
+```
+
+### deploy
+
+```
+docker-compose exec blog hexo deploy
+```
+
+### clean
+
+```
+docker-compose exec blog hexo clean
+```

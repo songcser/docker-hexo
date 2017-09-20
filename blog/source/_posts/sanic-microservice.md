@@ -16,9 +16,10 @@ tags:
 
 微服务是最近最火开发模式，它解决了复杂性问题，提高开发效率，便于部署等优点。
 
-Sanic框架是和Flask相似的异步协程框架，简单轻量，并且性能很高。本项目就是以sanic为基础搭建的微服务框架。
+正是结合这些优点, 以Sanic为基础，集成多个流行的库来搭建微服务。 Sanic框架是和Flask相似的异步协程框架，简单轻量，并且性能很高。
 
-正是结合这些优点, 以Sanic为基础，集成多个流行的库搭建微服务框架。
+本项目就是以Sanic为基础搭建的微服务框架。
+
 
 # 特点
 
@@ -139,7 +140,7 @@ get_city_by_id, get_role_by_id是并行处理。
 [sanic](https://github.com/channelcat/sanic)
 
 
-# 模型设计&ORM
+# 模型设计 & ORM
 
 > Peewee is a simple and small ORM. It has few (but expressive) concepts, making it easy to learn and intuitive to use。
 >
@@ -295,7 +296,7 @@ async def get_city_by_id(request, id):
 [jaeger](https://uber.github.io/jaeger/)
 
 
-# API接口
+# API接口文档
 
 > api文档使用swagger标准。
 
