@@ -34,6 +34,8 @@ tags:
 
 # 使用
 
+项目地址： [sanic-ms](https://github.com/songcser/sanic-ms)
+
 [Example](https://github.com/songcser/sanic-ms/tree/master/examples)
 
 # 服务端
@@ -296,7 +298,7 @@ async def get_city_by_id(request, id):
 [jaeger](https://uber.github.io/jaeger/)
 
 
-# API接口文档
+# API接口
 
 > api文档使用swagger标准。
 
