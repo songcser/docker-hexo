@@ -74,7 +74,6 @@ deploy:
     github: git@github.com:songcser/songcser.github.io.git,master
     coding: git@git.coding.net:songcser/songcser.git,master
 
-
 gcs: # GOOGLE CUSTOM SEARCH
 baidutongji: 9dc76ff7c27726f611c9dea1a3b894d5
 disqus: # DISQUS ID
@@ -83,6 +82,7 @@ gitalk:
   repo: songcser.github.io
   client_id: 09000ea053fee357b238
   client_secret: a9b39ea3928ad9e2e30f40bc70d82fc40f5c8207
+
 
 location: Shang Hai
 email: songjiyi2008@163.com
@@ -101,5 +101,5 @@ avatar: https://dn-coding-net-production-static.qbox.me/d369021c-643f-480e-ae0a-
 social:
   github: https://github.com/songcser
   weibo: http://weibo.com/1751043871
-  linkedin: 
+  linkedin: http://www.linkedin.com/in/herry-song-4954b85a/
 
