@@ -4,11 +4,11 @@
 
 # Site
 title: Herry's blog
-subtitle:
-description:
+subtitle: 
+description: 
 author: songcser
-language:
-timezone:
+language: 
+timezone: 
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
