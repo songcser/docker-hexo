@@ -1,10 +1,13 @@
 ---
-title: 抽象类Protocol异步IO
+title: asyncio之抽象类Protocol异步IO
 date: 2017-10-13 07:54:30
-tags:
+tags: [asyncio, 异步, 协程]
+categories:
+  - asyncio
 ---
 
-到目前为止，那些例子都避免混合并发和IO操作，以便每次都关注一个概念。当IO阻塞时进行上下文切换是asyncio一个主要的用例。基于已经介绍的并发概念，这节验证两个例程，一个简单的服务端和客户端，和在socket和socketserver那节中的例子相似。客户端能够连接服务端，发送数据然后接收相同的数据。每一次遇到IO操作时，执行代码就会放弃控制给事件循环，允许其他的任务运行直到IO操作完成。
+到目前为止，那些例子都避免混合并发和IO操作，以便每次都关注一个概念。当IO阻塞时进行上下文切换是asyncio一个主要的用例。
+基于已经介绍的并发概念，这节验证两个例程，一个简单的服务端和客户端，和在socket和socketserver那节中的例子相似。客户端能够连接服务端，发送数据然后接收相同的数据。每一次遇到IO操作时，执行代码就会放弃控制给事件循环，允许其他的任务运行直到IO操作完成。
 
 ## 服务端
 
@@ -29,13 +32,13 @@ log = logging.getLogger('main')
 event_loop = asyncio.get_event_loop()
 ```
 
-定义一个asyncio.Protocol的子类处理客户端的连接。在服务端的socket连接事件发生时protocol的对象方法就被调用。
+定义一个asyncio.Protocol的子类处理客户端的连接。基于事件的服务端socket连接发生时，protocol对象的方法被调用。
 
 ```python
 class EchoServer(asyncio.Protocol):
 ```
 
-每一个新的客户端连接都要触发connection_made()方法调用。transport的参数是asyncio.Transport实例，它提供了使用socket的抽象异步IO。不同的连接类型提供了不同的transport接口，都使用相同的API。例如，transport类分离了用于socket和用于子进程管道。客户端的地址可以通过tansport的get_extra_info()方法获得，一个特定实现的接口。
+每一个新的客户端连接都要触发connection_made()方法调用。transport的参数是asyncio.Transport实例，它提供了使用socket的抽象异步IO。不同的连接类型提供了不同的transport接口，都使用相同的API。例如，有单独的transport类用于处理socket和用于处理子进程的管道。客户端的地址可以通过tansport特定实现的接口get_extra_info()方法获得。
 
 ```python
     def connection_made(self, transport):
@@ -47,7 +50,7 @@ class EchoServer(asyncio.Protocol):
         self.log.debug('connection accepted')
 ```
 
-链接建立之后，客户端传来的数据通过protocol的data_received()方法被调用。数据以字节类型传输，到达应用时以合适的方法进行解码。日志记录下结果，然后通过调用tansport.write()将response立即返回给客户端。
+链接建立之后，客户端传来的数据通过调用protocol的data_received()方法获得。数据以字节类型传输，到达应用时以合适的方法进行解码。日志记录下结果，然后通过调用tansport.write()将response立即返回给客户端。
 ```python
     def data_received(self, data):
         self.log.debug('received {!r}'.format(data))
@@ -64,7 +67,7 @@ class EchoServer(asyncio.Protocol):
             self.transport.write_eof()
 ```
 
-当链接关闭时，无论正常的或者错误的结果，protocol的connection_lost()方法都被调用。如果是错误发生，参数中包含一个相关的异常对象。否则是None
+当链接关闭时，无论正常的或者错误的结果，protocol的connection_lost()方法都被调用。如果发生错误，参数中包含一个相关的异常对象，否则是None
 
 ```python
     def connection_lost(self, error):
@@ -74,7 +77,7 @@ class EchoServer(asyncio.Protocol):
             self.log.debug('closing')
         super().connection_lost(error)
 ```
-需要两步启动服务。首先应用调用事件循环使用protocol类来建立一个新的server对象和hostname和socket来进行监听。create_server()方法是协程，所以返回结果必须通过事件循环来启动server。完整的协程会产生asyncio.Server实例绑定到事件循环上。
+需要两步启动服务。首先应用程序调用调用事件循环,使用protocol类以及要监听的hostname和socket来创建一个新的server对象。create_server()方法是协程，所以返回结果必须通过事件循环产生，并且启动server。完成协程会产生绑定到事件循环上的asyncio.Server实例。
 
 ```python
 # Create the server and let the loop finish the coroutine before starting the real event loop.
@@ -82,7 +85,7 @@ factory = event_loop.create_server(EchoServer, *SERVER_ADDRESS)
 server = event_loop.run_until_complete(factory)
 log.debug('starting up on {} prot {}'.format(*SERVER_ADDRESS))
 ```
-为了处理事件和客户端请求事件循环需要一直运行。对于长时间运行的服务，run_forever()方法是最简单的方式。当事件循环停止， 无论通过应用代码或者通过进程的信号，server都会关闭来清理socket，然后关闭事件循环完成处理其他的协程在程序退出之前。
+然后，需要运行事件循环才能处理事件和处理客户端请求。对于长时间运行的服务，run_forever()方法是最简单的方式。当事件循环停止， 无论通过应用代码或者通过发信号给进程，都可以关闭server并且正确清理socket，然后在程序退出之前关闭事件循环以完成处理其他的协程。
 
 ```python
 # Enter the event loop permanently to handle all connections.
@@ -125,7 +128,7 @@ log = logging.getLogger('main')
 event_loop = asyncio.get_event_loop()
 ```
 
-protocol类客户端定义了和服务端相同的方法，使用了不同的接口。构造类接收两个参数，一个是需要发送的消息列表和Futrue实例用来通知客户端已经完成一个任务循环通过接收服务端的相应。
+protocol类的客户端定义了和服务端相同的方法，使用了不同的接口。构造类接收两个参数，即需要发送的消息列表,以及Futrue实例，用来从服务端接收响应以通知客户端已经完成一个任务循环。
 
 ```python
 class EchoClient(asyncio.Protocol):
@@ -139,7 +142,7 @@ class EchoClient(asyncio.Protocol):
 
 当客户端成功链接上服务端，立即进行通信。一系列的消息同时发送，不过在网络代码之下可能组合多个消息一次发送。当所有的消息发送完，最后发送EOF。
 
-虽然看起来数据是被立即发送出去的，事实上transport对象缓存发出去的数据，并且建立回调来实际发送当socket的缓存准备好发送的数据时。这些处理都是透明的，所以应用代码可以像刚才IO操作发生时一样。
+虽然看起来数据是被立即发送出去的，事实上transport对象先缓存需要发出去的数据，并且建立回调，当socket缓存准备好发送数据时才实际发送。这些处理都是透明的，所以应用代码可以像刚才进行IO操作时一样。
 
 ```python
     def connection_made(self, transport):
@@ -158,14 +161,14 @@ class EchoClient(asyncio.Protocol):
             transport.write_eof()
 ```
 
-当接收到服务端的相应时，打印日志。
+当接收到服务端的响应时，打印日志。
 
 ```python
     def data_received(self, data):
         self.log.debug('received {!r}'.format(data))
 ```
 
-当接收到EOF标记或者服务端关闭了链接，本地的transport对象也被关闭，future对象被标记完成通过设置结果。
+当接收到EOF标记或者服务端关闭了链接，本地的transport对象也被关闭，future对象通过设置结果被标记完成。
 
 ```python
     def eof_received(self):
@@ -182,7 +185,7 @@ class EchoClient(asyncio.Protocol):
         super().connection_lost(exc)
 ```
 
-通常protocol类传递给事件循环来创建链接。在这个例子中，因为事件循环传递其他的参数给protocol构造器，所以需要创建partial来包裹client类和发送的消息列表和Future实例。当调用create_connection()来建立客户端链接时，使用新的调用来代替。
+通常protocol类被传递给事件循环来创建连接。在这个例子中，因为事件循环传递其他的参数给protocol构造器，所以需要创建一个partial来包裹client类和发送的消息列表和Future实例。当调用create_connection()建立客户端链接时，使用新的可调用的类来代替。
 
 ```python
 client_completed = asyncio.Future()
@@ -198,7 +201,7 @@ factory_coroutine = event_loop.create_connection(
 )
 ```
 
-为了触发客户端运行，事件循环将使用与用于创建客户端的协程一起调用，然后再和客户端的Future实例一起完成通信。使用两个调用是避免客户端程序在完成服务端链接退出时进入死循环。如果只使用第一个调用等待协程创建客户端，则不可能处理所有的返回数据和清理服务端的链接。
+为了触发客户端运行，使用协程创建客户端时调用事件循环一次，然后在客户端完成时使用Future实例完成通信。像这样使用两个调用是避免客户端程序在完成服务端连接退出时进入死循环。如果只使用第一个调用等待协程创建客户端，则不可能处理所有的返回数据和清理服务端的链接。
 
 ```python
 log.debug('waiting for client to complete')
@@ -250,7 +253,7 @@ EchoClient: server closed connection
 main: closing event loop
 ```
 
-尽管客户端一直独立的发送消息，第一次客户端运行服务端接收大量数据然后返回给客户端。这些结果在后续运行中有所不同, 这取决于网络拥挤和在所有数据准备好之后进行网络缓存刷新。
+尽管客户端一直独立的发送消息，但是客户端第一次运行接收到服务端返回的大量数据。这些响应数据在后续运行中有所不同, 这取决于网络拥挤和在所有数据准备好之后进行网络缓存刷新。
 
 ```
 $ python3 asyncio_echo_server_protocol.py

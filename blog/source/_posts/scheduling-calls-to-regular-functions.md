@@ -1,16 +1,18 @@
 ---
-title: 常规函数调用
+title: asyncio之常规函数调用
 date: 2017-09-26 10:48:23
-tags:
+tags: [asyncio, 异步, 协程]
+categories:
+  - asyncio
 ---
 
 除了管理协程和IO回调，asyncio事件循环可以根据loop中保留的定时器来调度常规函数。
 
 ## 调度回调函数"Soon"
 
-如果回调的定时器不重要，call_soon()方法在loop的下次迭代中进行调度。方法被调用时可以将一些额外的位置参数传递给回调。可以使用functools模块的partial()方法将关键字参数传给回调。
+如果回调的时间无关紧要，可以使用call_soon()方法在loop的下次迭代中进行调度。方法被调用时可以将一些额外的位置参数传递给回调。可以使用functools模块的partial()方法将关键字参数传给回调。
 
-```
+```python
 # asyncio_call_soon.py
 
 import asyncio
@@ -51,7 +53,7 @@ closing event loop
 
 使用call_later()推迟一段时间调用回调。第一个参数是延迟的秒数，第二个参数是回调函数。
 
-```
+```python
 # asyncio_call_later.py
 
 import asyncio
@@ -76,7 +78,7 @@ finally:
     event_loop.close()
 ```
 
-在这个例子中，一些回调函数在不同的时间使用不同的参数被调用。使用call_soon()调用的最后的例子，带着参数3的回调函数要在时间延迟调度例子的前面获取结果，显然"soon"通常暗示最小的延迟。
+在这个例子中，一些回调函数在不同的时间使用不同的参数被调用。最后的实例中使用call_soon()调用带着参数3的回调函数,要在时间延迟调度实例的前面获取结果，显然"soon"通常暗示最小的延迟。
 
 ```
 # python3 asyncio_call_later.py
@@ -91,9 +93,9 @@ closing event loop
 
 ## 在具体时间调度回调函数
 
-也可以在具体时间调用回调函数。loop使用monotonic clock而不是wall-clock time，以确保"now"的值不会后退。选择调度回调函数的时间需要从内部状态开始，要使用loop的time()函数。
+也可以在具体时间调用回调函数。loop使用单调时间(monotonic clock)而不是挂钟时间(wall-clock time)，以确保"now"的值不会后退。选择调度回调函数的时间需要从内部状态开始，要使用loop的time()函数。
 
-```
+```python
 # asyncio_call_at.py
 
 import asyncio

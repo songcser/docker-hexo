@@ -1,7 +1,10 @@
 ---
-title: Sanic Micro Service
+title: 基于Sanic的微服务框架
 date: 2017-09-20 01:25:50
-tags:
+tags: [asyncio, sanic, aiohttp, peewee, opentracing]
+categories:
+  - asyncio
+  - sanic
 ---
 
 基于sanic的微服务基础架构

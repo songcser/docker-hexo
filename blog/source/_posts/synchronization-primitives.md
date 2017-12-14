@@ -1,14 +1,16 @@
 ---
-title: 同步原语
+title: asyncio之同步原语
 date: 2017-10-11 02:00:55
-tags:
+tags: [asyncio, 异步, 协程]
+categories:
+  - asyncio
 ---
 
-尽管asyncio应用经常是单线程进程运行，但是也同样可以同步应用构建。每一个coroutine或task可能在不可预测的顺序执行，基于延迟、IO中断和其他事件。为了支持安全同步，asyncio提供了和threading和multiprocessing模块相同的低水平的原始接口。
+尽管asyncio应用经常是单线程进程运行，但是也同样可以构建同步应用。基于延迟、IO中断和其他事件的每一个coroutine或task可能在不可预测的顺序执行。为了支持安全同步，asyncio提供了和threading和multiprocessing模块相同的低水平原始接口。
 
 ## 锁
 
-锁可以保证访问共享资源。只有加锁的才能使用资源。多个试图获取锁的将会阻塞住以便同一时间只有一个获取锁。
+锁可以保证安全访问共享资源。只有加锁的才能使用资源。多个试图获取锁的将会阻塞住以便同一时间只有一个获取锁。
 
 ```python
 # asyncio_lock.py
@@ -57,7 +59,7 @@ finally:
     event_loop.close()
 ```
 
-在这个例子中，lock可以直接调用，使用await获取锁，使用release()方法来释放锁在coro2()方法中。在coro1中，可以使用with await关键字作为同步上下文管理。
+在这个例子中，lock可以直接调用，在coro2()方法中使用await获取锁，使用release()方法来释放锁。在coro1中可以使用with await关键字作为同步上下文管理。
 
 ```
 $ python3 asyncio_lock.py

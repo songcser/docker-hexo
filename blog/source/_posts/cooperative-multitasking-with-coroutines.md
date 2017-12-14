@@ -1,16 +1,18 @@
 ---
-title: 协程的多任务处理
+title: asyncio之协程的多任务处理
 date: 2017-09-25 10:52:24
-tags: asyncio 异步 协程
+tags: [asyncio, 异步, 协程]
+categories:
+  - asyncio
 ---
 
-协程是一种用于并发操作的语言结构。协程函数在被调用时创建协程对象，调用者可以使用协程的send()的方法来运行代码。协程通过await可以停止其他协程的执行。停止后，协程的状态是meaintained,在下次被唤醒时从这个地方继续运行。
+协程是一种用于并发操作的语言结构。协程函数在被调用时创建协程对象，调用者可以使用协程的send()的方法来运行代码。协程通过await可以停止其他协程的执行。停止后的协程的状态是meaintained,在下次被唤醒时从这个地方继续运行。
 
 ## 开始一个协程
 
-有几种不同的方法使用asyncio事件循环启动协程。最简单的方式是使用run_until_complete()方法，直接执行协程。
+有几种不同的方法可以使用asyncio事件循环启动协程。最简单的方式是使用run_until_complete()方法，直接运行协程。
 
-```
+```python
 # asyncio_coroutine.py
 
 import asyncio
@@ -29,7 +31,7 @@ finally:
     event_loop.close()
 ```
 
-首先获取事件循环的引用，使用默认的loop或者指定特定的loop类。在这个例子中，使用类默认的loop。run_untile_complete()方法使用协程对象启动loop，当协程退出返回时停止loop。
+首先获取事件循环的引用，使用默认的loop或者指定特定的loop类。在这个例子中，使用类默认的loop。run_untile_complete()方法使用协程对象启动loop，当协程返回退出时停止loop。
 
 ```
 # python3 asyncio_coroutine.py
@@ -40,11 +42,11 @@ in coroutine
 closing event loop
 ```
 
-## 协程的返回值
+## 协程返回值
 
 协程的返回值是从它开始启动并且等待运行结束的代码处返回的。
 
-```
+```python
 # asyncio_coroutine_return.py
 
 import asyncio
@@ -73,9 +75,9 @@ it returned: 'result'
 
 ## 协程链
 
-一个协程可以启动另一个协程并且等待值的返回。 这使得更容易将任务分解成可重用的部分。下面的例子中有两个段落是按顺序执行的，但可以和其他操作并行运行。
+一个协程可以启动另一个协程并且等待返回值。 这样更容易将任务分解成可重用的部分。下面的例子中有两个阶段必须按顺序执行，但可以和其他操作同时运行。
 
-```
+```python
 # asyncio_coroutine_chain.py
 
 import asyncio
@@ -118,11 +120,11 @@ return value: ('result', 'result2 derived from result1')
 
 ## 协程代替生成器
 
-协程函数是asyncio的关键组件。它提供了语言级别的特性，可以停止程序执行的一部分，并且保存调用的状态，和最后重新进入的状态，这些都是并发框架具备的重要功能。
+协程函数是asyncio的关键组件。它提供了语言级别的特性，可以停止程序执行了一部分，并且保存调用的状态，和最后重新进入的状态，这些都是并发框架具备的重要功能。
 
 Python 3.5加入了新的语言特性，使用async def来定义原生的协程和使用await获取控制权。asyncio的例子都使用了新的特性。较早的Python3版本使用生成器函数，asyncio.coroutine()装饰器和yield from完成了相同的功能。
 
-```
+```python
 # asyncio_generator.py
 
 import asyncio

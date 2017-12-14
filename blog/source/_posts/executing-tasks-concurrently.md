@@ -1,16 +1,16 @@
 ---
-title: Task并发
+title: asyncio之执行并发任务
 date: 2017-09-26 22:23:40
 tags:
 ---
 
-Task是与事件循环交互的主要方式之一。 Task包装协程并跟踪它的完成。 Tasks是Future的子类，所以其他协程等待他们并且每一个都会获得task完成时返回的结果。
+Task是与事件循环交互的主要方式之一。 Task包装协程并跟踪它的完成。 Tasks是Future的子类，所以其他协程等待他们并且每一个协程都会获得task完成时返回的结果。
 
 ## 启动Task
 
-使用create_task()创建Task实例启动任务。task将做为事件循环并发操作的一部分运行，只要loop正在运行，并且协程  没有返回。
+使用create_task()创建Task实例启动任务。只要loop正在运行，并且协程没有返回，task将做为事件循环并发操作的一部分一直运行。
 
-```
+```python
 # asyncio_create_task.py
 
 import asyncio
@@ -36,7 +36,7 @@ finally:
 
 这个例子中main()函数退出之前需要等待task返回结果。
 
-```
+```python
 # python3 asyncio_create_task.py
 
 creating task
@@ -48,9 +48,9 @@ return value: 'the result'
 
 ## 取消Task
 
-通过create_task()可以返回Task对象，就有可能取消task的操作在它完成之前。
+通过create_task()可以返回Task对象，这样就可以在task完成之前取消操作。
 
-```
+```python
 # asyncio_cancel_task.py
 
 import asyncio
@@ -81,7 +81,7 @@ finally:
     event_loop.close()
 ```
 
-这个例子中在事件循环开始之前创建然后取消task。会从run_until_complete()函数中抛出CancelledError异常。
+这个例子中在事件循环开始之前创建task然后取消，会从run_until_complete()函数中抛出CancelledError异常。
 
 ```
 # python3 asyncio_cancel_task.py
@@ -94,7 +94,7 @@ caught error from canceled task
 
 如果task在等待其他并发操作时被取消，它会在它等待的地方抛出CancelledError异常来通知task被取消。
 
-```
+```python
 # asyncio_cancel_task2.py
 
 import asyncio
@@ -130,7 +130,7 @@ finally:
     event_loop.close()
 ```
 
-如果需要，截获异常能够提供机会来清理已经完成的任务。
+如果需要，截获异常能够有机会来清理已经完成的任务。
 
 ```
 $ python3 asyncio_cancel_task2.py
@@ -143,11 +143,11 @@ task_func was canceled
 main() also sees task as canceled
 ```
 
-## 从协程生成Task
+## 由协程生成Task
 
-ensure_future()函数返回Task绑定到协程上。Task实例可以通过其他代码等待执行，而不知道原始协程被构造或调用。
+ensure_future()函数返回的Task可以绑定到协程上。然后Task实例可以传递给其他代码，这些代码可以在不知道原始协程是如何构造或调用的情况下等待它。
 
-```
+```python
 # asyncio_ensure_future.py
 
 import asyncio
@@ -180,7 +180,7 @@ finally:
 
 记住ensure_future()函数生成的协程不会执行,直到使用await允许它执行。
 
-``` bash
+```
 $ python3 asyncio_ensure_future.py
 
 entering event loop

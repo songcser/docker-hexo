@@ -1,10 +1,12 @@
 ---
-title: 协程和线程进程组合
+title: asyncio之协程和线程进程组合
 date: 2017-11-13 07:32:01
-tags:
+tags: [asyncio, 异步, 协程]
+categories:
+  - asyncio
 ---
 
-许多已经存在的库还没有使用原生的asyncio。可能造成阻塞或者依赖模块不可用的并发特性。还是有可能在基于asyncio的应用中使用这些库，通过使用concurrent.futures的executor可以在一个分离的线程或者进程中运行代码。
+许多已经存在的库还没有使用原生的asyncio。可能造成阻塞或者依赖并发特性的模块不可用。还是有可能在基于asyncio的应用中使用这些库，通过使用concurrent.futures的executor可以在一个分离的线程或者进程中运行代码。
 
 ## 线程
 
@@ -68,7 +70,7 @@ if __name__ == '__main__':
         event_loop.close()
 ```
 
-asyncio_executor_thread.py使用logging可以方便的表明哪一个线程和函数产生的每一条日志信息。由于在每一个blocks()函数中调用使用分离的logger,输出清晰的显示了重复使用相同的线程以不同的参数跳用函数的多个副本。
+asyncio_executor_thread.py使用logging可以方便的表明哪一个线程和函数产生的每一条日志信息。由于在每一个blocks()函数中使用分离的logger,以下输出清晰的显示了重复使用相同的线程以不同的参数调用函数的多个副本。
 
 ```
 $ python3 asyncio_executor_thread.py
@@ -94,7 +96,7 @@ MainThread run_blocking_tasks: exiting
 
 ## 进程
 
-ProcessPoolExecutor工作在相同的方式，代替线程创建一些工作进程。使用分离的进程需要更多的系统资源，但是对于计算密集型操作可以合理的在每一个CPU运行单独的任务。
+ProcessPoolExecutor以相同的方式工作，代替线程创建一些进程工作。使用分离的进程需要更多的系统资源，但是对于计算密集型操作可以合理的在每一个CPU运行单独的任务。
 
 ```python
 # asyncio_executor_process.py

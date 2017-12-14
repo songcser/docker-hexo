@@ -1,14 +1,16 @@
 ---
-title: 使用SSL
+title: asyncio之使用SSL
 date: 2017-10-23 09:50:35
-tags:
+tags: [asyncio, 异步, 协程]
+categories:
+  - asyncio
 ---
 
-asyncio内置支持在套接字上启用SSL通信。通过将SSLContext实例传递给协程来创建服务器或者客户端链接，可支持并确保在将套接字交给应用程序使用之前启用了SSL协议。
+asyncio内置支持在套接字上启用SSL通信。通过将SSLContext实例传递给协程来创建服务器或者客户端连接，可支持并确保在将套接字交给应用程序使用之前启用SSL协议。
 
 比以前章节中以协程为基础的服务端和客户端更新了一些小变化。首先创建证书和key文件。使用下面命令生成自签名证书。
 
-```
+```sh
 $ openssl req -newkey rsa:2048 -nodes -keyout pymotw.key -x509 -days 365 -out pymotw.crt
 ```
 
@@ -21,7 +23,7 @@ factory = asyncio.start_server(echo, *SERVER_ADDRESS)
 server = event_loop.run_until_complete(factory)
 ```
 
-为了加入编码认证，创建带证书和刚生成的key的SSLContext，然后传递给start_server()方法。
+为了加入编码认证，需要创建带证书和带刚生成key的SSLContext，然后传递给start_server()方法。
 
 ```python
 # The certificate is created with pymotw.com as the hostname,
@@ -41,7 +43,7 @@ factory = asyncio.start_server(echo, *SERVER_ADDRESS, ssl=ssl_context)
     reader, writer = await asyncio.open_connection(*address)
 ```
 
-也需要SSLContext来保护客户端的套接字。客户端身份不需要强制，只需要加载证书。
+也需要SSLContext来保护客户端的socket。客户端身份不需要强制，只需要加载证书。
 
 ```python
     # The certificate is created with pymotw.com as the hostname,
@@ -110,7 +112,7 @@ async def echo(reader, writer):
             return
 ```
 
-在一个窗口启动服务端，在另一个窗口运行客户端，生成如下输出。
+在一个窗口启动服务端，在另一个窗口运行客户端，如下输出。
 
 ```
 $ python3 asyncio_echo_server_ssl.py

@@ -1,14 +1,16 @@
 ---
-title: 子进程交互
+title: asyncio之子进程交互
 date: 2017-10-26 07:58:09
-tags:
+tags: [asyncio, 异步, 协程]
+categories:
+  - asyncio
 ---
 
-经常需要和其他程序和进程一起工作，利用已经存在的代码不去重写，或者访问Python中不可用的库或特性。和网络IO一样，asyncio包括两个抽象概念来启动其他程序然后进行交互。
+经常需要和其他的一些程序和进程一起工作，以便使用已经存在的代码而不用重写，或者访问Python中已经不可用的库或特性。和网络IO一样，asyncio包含两个抽象概念来启动其他程序然后进行交互。
 
 ## 对于Subprocesses使用Protocol Abstraction
 
-这个例子使用协程来启动一个进程运行Unix命令df，寻找磁盘的剩余空间。使用subprocess_exec()启动进程并把它绑定到protocol类，这样就知道如何读取df的命令输出并分析。protocol类的方法被自动调用当subprocess的IO事件发生时。由于stdin和stderr参数都设置为Nore，这些通信管道没有连接到新的进程。
+这个例子使用协程来启动一个进程运行Unix命令df，寻找磁盘的剩余空间。使用subprocess_exec()启动进程并把它绑定到protocol类，这样就知道如何读取df的命令输出并分析。当subprocess的IO事件发生时protocol类的方法被自动调用。由于stdin和stderr参数都设置为Nore，这些通信管道没有连接到新的进程。
 
 ```python
 # asyncio_subprocess_protocol.py
@@ -38,7 +40,7 @@ async def run_df(loop):
     return cmd_done.result()
 ```
 
-DFProtocol类由SubprocessProtocol派生出，定义了类的API来和其他进程通过管道进行通信。done参数期望是Future对象，这样调用者可以监听到进程的完成。
+DFProtocol类由SubprocessProtocol派生出，定义类API和其他进程通过管道进行通信。done参数期望是Future对象，这样调用者可以监听到进程的完成。
 
 ```python
 class DFProtocol(asyncio.SubprocessProtocol):
@@ -51,7 +53,7 @@ class DFProtocol(asyncio.SubprocessProtocol):
         super().__init__()
 ```
 
-和套接字连接一样，当输入管道有新的进程建立时，connection_made()方法被调用。transport参数是BaseSubprocessTransport子类的实例。如果进程配置成可以接收输入，可以通过进程读取数据输出，并且写入数据到进程的输入流。
+和socket连接一样，当输入管道有新的进程建立时，connection_made()方法被调用。transport参数是BaseSubprocessTransport子类的实例。如果进程配置成可以接收输入，可以通过进程读取数据输出，并且写入数据到进程的输入流。
 
 ```python
     def connection_made(self, transport):
@@ -59,7 +61,7 @@ class DFProtocol(asyncio.SubprocessProtocol):
         self.transport = transport
 ```
 
-当进程生成输出，pipe_data_received()方法被调用，获取存储数据的文件描述符，并且从管道中读取真实数据。protocol类保存了进程的标准输出管道中的最新生成在缓存中的输出。
+当进程产生输出，pipe_data_received()方法被调用，获取存储数据的文件描述符，并且从管道中读取真实数据。protocol类将进程的标准输出管道的输出保存在缓冲区中供以后处理。
 
 ```python
     def pipe_data_received(self, fd, data):
@@ -68,7 +70,7 @@ class DFProtocol(asyncio.SubprocessProtocol):
             self.buffer.extend(data)
 ```
 
-当进程中断，process_exited()被调用。transport对象通过调用get_returncode()方法可以获取进程的退出码。在这个例子中，如果没有error生成，输出在返回之前通过Future实例将被解码分析。如果有error，结果假定是空的。进程退出时run_df()方法设置future的结果，所有它进行清理并且返回结果。
+当进程中断，process_exited()被调用。transport对象通过调用get_returncode()方法可以获取进程的退出码。在这种情况下，如果没有错误报告，则在通过Future实例返回之前，可用的输出将被解码分析。如果有错误，则结果被假定为空。进程退出时告诉run_df()方法设置future的结果，所有该方法清理并且返回结果。
 
 ```python
     def process_exited(self):
@@ -104,7 +106,7 @@ class DFProtocol(asyncio.SubprocessProtocol):
         return results
 ```
 
-run_df()协程使用run_until_complete()方法运行，检测结果并且每一个设备的剩余空间被打印。
+run_df()协程使用run_until_complete()方法运行，检测每一个设备的剩余空间并打印。
 
 ```python
 event_loop = asyncio.get_event_loop()
@@ -123,7 +125,7 @@ else:
         print('{Mounted:25}: {Avail}'.format(**r))
 ```
 
-下面的输出显示所采取步骤的顺序，和在他运行系统上三个设备的剩余空间。
+下面的输出显示执行步骤的顺序，和运行系统上三个设备的剩余空间。
 
 ```
 $ python3 asyncio_subprocess_protocol.py
@@ -143,9 +145,9 @@ Free space:
 /Volumes/hubert-tm          : 2.3Ti
 ```
 
-## 协程和流调用子进程
+## 使用协程和流调用子进程
 
-使用协程直接运行进程，而不是通过Protocol子类访问，调用create_subprocess_exec()并且stdout, stderr和stdin连接到管道。协程的返回结果是进程实例产生的子进程，能够管理子进程和进行通信。
+使用协程直接运行进程，而不是通过Protocol子类访问，请调用create_subprocess_exec()并且指定要连接到的管道stdout, stderr和stdin。协程生成子进程的结果是一个Process实例，可用于管理子进程或与之通信。
 
 ```python
 # asyncio_subprocess_coroutine.py
@@ -167,7 +169,7 @@ async def run_df():
     print('process started {}'.format(proc.pid))
 ```
 
-在这个例子中， 除了命令行参数外，df不需要任何输入，所以下一步就是读取所有的输出。使用Protocol没有控制同一时间读取多少数据。这个例子使用readline()，但是也可以直接调用read()方法读取数据而不是面向行级的。和protocol例子一样，命令的输出进行了缓存，稍后打印出来。
+在这个例子中， 除了命令行参数外，df不需要任何输入，所以下一步就是读取所有的输出。Protocol没有控制同一时间读取多少数据。这个例子使用readline()，但是也可以直接调用read()方法读取数据而不是面向行级的。和protocol例子一样，命令的输出进行了缓存，稍后打印出来。
 
 ```python
     while True:
@@ -179,14 +181,14 @@ async def run_df():
         buffer.extend(line)
 ```
 
-当没有更多输出时，readline()方法返回空字符串因为程序完成。为了保证正确清理进程，下一步是等待进程完全退出。
+因为程序完成，没有更多输出时，readline()方法返回空字符串。为了保证正确清理进程，下一步是等待进程完全退出。
 
 ```python
     print('waiting for process to complete')
     await proc.wait()
 ```
 
-有一点是可以检查退出状态，以确定是解析输出还是错误处理，因为它不产生输出。逻辑解析和前面的例子是一样的，但是是独立的函数（这里没有显示），因为没有protocol类来隐藏它。数据解析之后，结果和退出码返回给调用者。
+此时可以检查退出状态，以确定是解析输出还是错误处理，因为它不产生输出。逻辑解析和前面的例子是一样的，但是是独立的函数（这里没有显示），因为没有protocol类来隐藏它。数据解析之后，结果和退出码返回给调用者。
 
 ```python
     return_code = proc.returncode
@@ -200,7 +202,7 @@ async def run_df():
     return (return_code, results)
 ```
 
-主程序和基于protocol的示例看起来相似，因为实现的不同都是独立在run_df()方法中。
+主程序和基于protocol的示例看起来相似，因为实现的不同部分都是独立在run_df()方法中。
 
 ```python
 event_loop = asyncio.get_event_loop()

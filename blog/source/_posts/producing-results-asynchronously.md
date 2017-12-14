@@ -1,16 +1,18 @@
 ---
-title: 异步生成结果
+title: asyncio之异步生成结果
 date: 2017-09-26 18:01:09
-tags:
+tags: [asyncio, 异步, 协程]
+categories:
+  - asyncio
 ---
 
-Future代表任务的结果还没有生成。事件循环能够监控Future对象的状态来标示完成，运行应用的一部分等待另一部分完成任务。
+Future代表任务的结果还没有生成。事件循环能够监控Future对象的状态来标示完成，并且允许应用的一部分等待另一部分完成任务。
 
-## 编写Future
+## 等待Future
 
 Future的行为和协程一样，因此一些有用的等待协程的方法也可以用来等待Future的完成。这个例子将future传递给事件循环的run_until_complete()方法。
 
-```
+```python
 # asyncio_future_event_loop.py
 
 import asyncio
@@ -36,10 +38,10 @@ finally:
 print('future result: {!r}'.format(all_done.result()))
 ```
 
-当set_result()方法被调用时Future的state改变了，并且Future实例保存结果以便最后返回结果。
+当set_result()方法被调用时Future的state改变了，并且Future实例保存结果以便最后返回。
 
 ```
-# python3 asyncio_future_event_loop.py
+$ python3 asyncio_future_event_loop.py
 
 scheduling mark_done
 entering event loop
@@ -51,7 +53,7 @@ future result: 'the result'
 
 Future也可以使用await关键字，如下所示。
 
-```
+```python
 # asycnio_future_await.py
 
 import asyncio
@@ -79,7 +81,7 @@ finally:
 Future的结果通过await返回，因此经常有可能普通协程函数和Future实例使用相同的代码。
 
 ```
-# python3 asyncio_future_await.py
+$ python3 asyncio_future_await.py
 
 scheduling mark_done
 setting future result to 'the result'
@@ -90,7 +92,7 @@ returned result: 'the result'
 
 除了像协程一样工作，Future也可以在执行结束之后调用回调函数。回调函数按照注册的顺序进行调用。
 
-```
+```python
 # asyncio_future_callback.py
 
 import asyncio
@@ -117,7 +119,7 @@ finally:
     event_loop.close()
 ```
 
-回调函数要求应该有Future实例为第一个参数，传给回调的额外参数使用functools.partial()进行包裹
+回调函数要求Future实例为第一个参数，传给回调的额外参数使用functools.partial()进行包裹
 
 ```
 # python3 asyncio_future_callback.py
